@@ -1,0 +1,26 @@
+# Definir cabeçalhos de segurança
+Header set SafeBrowsing "max-age=86400"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+Header set X-XSS-Protection "1; mode=block"
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+# Redirecionar HTTP para HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Bloquear solicitações POST de referências não seguras
+RewriteCond %{REQUEST_METHOD} POST
+RewriteCond %{HTTP_REFERER} !^https://online2024.github.io/fotos/ [NC]
+RewriteRule ^ - [F,L]
+
+# Bloquear acesso de bots conhecidos
+RewriteCond %{HTTP_USER_AGENT} (Googlebot|bingbot|Baiduspider|Facebot|Slackbot) [NC]
+RewriteRule ^ - [F,L]
+
+# Excluir Instagram da lista de bloqueio
+RewriteCond %{HTTP_USER_AGENT} (Instagram) [NC]
+RewriteRule ^ - [L]
+RewriteCond %{REQUEST_METHOD} !^(GET|POST)$ [NC]
+RewriteRule ^ - [F,L]
